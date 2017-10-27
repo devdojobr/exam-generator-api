@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * @author William Suane for DevDojo on 10/27/17.
  */
@@ -19,11 +21,15 @@ import org.springframework.web.bind.annotation.*;
 @Api(description = "Operations related to professors' course")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
+    private final CourseService courseService;
     private final EndpointUtil endpointUtil;
 
     @Autowired
-    public CourseEndpoint(CourseRepository courseRepository, EndpointUtil endpointUtil) {
+    public CourseEndpoint(CourseRepository courseRepository,
+                          CourseService courseService,
+                          EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
+        this.courseService = courseService;
         this.endpointUtil = endpointUtil;
     }
 
@@ -42,10 +48,18 @@ public class CourseEndpoint {
     @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        Course course = courseRepository.findOne(id);
-        if(course == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        courseService.throwResourceNotFoundIfCourseDoesNotExist(courseRepository.findOne(id));
         courseRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Update course and return 200 Ok with no body")
+    @PutMapping
+    public ResponseEntity<?> update(@Valid @RequestBody Course course) {
+        courseService.throwResourceNotFoundIfCourseDoesNotExist(courseRepository.findOne(course));
+        courseRepository.save(course);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 }

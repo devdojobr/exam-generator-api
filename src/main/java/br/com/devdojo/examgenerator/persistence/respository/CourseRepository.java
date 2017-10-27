@@ -11,19 +11,21 @@ import java.util.List;
 /**
  * @author William Suane for DevDojo on 10/27/17.
  */
+@SuppressWarnings("ALL")
 public interface CourseRepository extends PagingAndSortingRepository<Course, Long> {
     @Query("select c from Course c where c.id = ?1 and c.professor = ?#{principal.professor}")
-    @Override
     Course findOne(Long id);
+
+    @Query("select c from Course c where c = ?1 and c.professor = ?#{principal.professor}")
+    Course findOne(Course course);
+
     @Query("select c from Course c where c.name like %?1% and c.professor = ?#{principal.professor}")
     List<Course> listCourses(String name);
 
-    @Override
     @Query("delete from Course c where c.id = ?1 and c.professor = ?#{principal.professor}")
     @Modifying
     void delete(Long id);
 
-    @Override
     @Query("delete from Course c where c = ?1 and c.professor = ?#{principal.professor}")
     @Modifying
     void delete(Course course);
