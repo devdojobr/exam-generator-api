@@ -31,8 +31,7 @@ public class CourseEndpoint {
 
     @ApiOperation(value = "Return a course based on it's id", response = Course.class)
     @GetMapping(path = "{id}")
-    public ResponseEntity<?> getCourseById(@PathVariable long id, Authentication authentication) {
-        Professor professor = ((ApplicationUser) authentication.getPrincipal()).getProfessor();
-        return new ResponseEntity<>(courseRepository.findByIdAndProfessor(id, professor), HttpStatus.OK);
+    public ResponseEntity<?> getCourseById(@PathVariable long id) {
+        return new ResponseEntity<>(courseRepository.findById(id), HttpStatus.OK);
     }
 }
