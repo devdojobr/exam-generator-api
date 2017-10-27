@@ -9,5 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface CourseRepository extends PagingAndSortingRepository<Course, Long> {
     @Query("select c from Course c where c.id = ?1 and c.professor = ?#{principal.professor}")
-    Course findById(long id);
+    @Override
+    Course findOne(Long aLong);
 }
