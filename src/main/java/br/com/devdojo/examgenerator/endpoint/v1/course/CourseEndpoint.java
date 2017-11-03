@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.course;
 
+import br.com.devdojo.examgenerator.persistence.model.ApplicationUser;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,7 +50,7 @@ public class CourseEndpoint {
     @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        courseService.throwResourceNotFoundIfCourseDoesNotExist(courseRepository.findOne(id));
+        courseService.throwResourceNotFoundIfCourseDoesNotExist(id);
         courseRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -56,10 +58,17 @@ public class CourseEndpoint {
     @ApiOperation(value = "Update course and return 200 Ok with no body")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Course course) {
-        courseService.throwResourceNotFoundIfCourseDoesNotExist(courseRepository.findOne(course));
+        courseService.throwResourceNotFoundIfCourseDoesNotExist(course);
         courseRepository.save(course);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @ApiOperation(value = "Create course and return the course created")
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody Course course) {
+        course.setProfessor(endpointUtil.extractProfessorFromToken());
+        return new ResponseEntity<>(courseRepository.save(course),HttpStatus.OK);
+    }
+
 
 
 }

@@ -1,10 +1,8 @@
 package br.com.devdojo.examgenerator.persistence.respository;
 
 import br.com.devdojo.examgenerator.persistence.model.Course;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,12 +19,4 @@ public interface CourseRepository extends PagingAndSortingRepository<Course, Lon
 
     @Query("select c from Course c where c.name like %?1% and c.professor = ?#{principal.professor}")
     List<Course> listCourses(String name);
-
-    @Query("delete from Course c where c.id = ?1 and c.professor = ?#{principal.professor}")
-    @Modifying
-    void delete(Long id);
-
-    @Query("delete from Course c where c = ?1 and c.professor = ?#{principal.professor}")
-    @Modifying
-    void delete(Course course);
 }
