@@ -33,4 +33,35 @@ public class Professor extends AbstractEntity {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public static final class Builder {
+        private Professor professor;
+
+        private Builder() {
+            professor = new Professor();
+        }
+
+        public static Builder newProfessor() {
+            return new Builder();
+        }
+
+        public Builder name(String name) {
+            professor.setName(name);
+            return this;
+        }
+
+        public Builder id(Long id) {
+            professor.setId(id);
+            return this;
+        }
+
+        public Builder email(String email) {
+            professor.setEmail(email);
+            return this;
+        }
+
+        public Professor build() {
+            return professor;
+        }
+    }
 }
