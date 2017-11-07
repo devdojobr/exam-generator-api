@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.util;
 
+import br.com.devdojo.examgenerator.exception.ResourceNotFoundException;
 import br.com.devdojo.examgenerator.persistence.model.ApplicationUser;
 import br.com.devdojo.examgenerator.persistence.model.Professor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,16 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Service
 public class EndpointUtil implements Serializable {
     public ResponseEntity<?> returnObjectOrNotFound(Object object) {
-        return object == null ? new ResponseEntity<>(NOT_FOUND) : new ResponseEntity<>(object, HttpStatus.OK);
+        if (object == null) throw new ResourceNotFoundException("Not found");
+        return new ResponseEntity<>(object, HttpStatus.OK);
     }
+
     public ResponseEntity<?> returnObjectOrNotFound(List<?> list) {
-        return list == null || list.isEmpty() ? new ResponseEntity<>(NOT_FOUND) : new ResponseEntity<>(list, HttpStatus.OK);
+        if (list == null || list.isEmpty()) throw new ResourceNotFoundException("Not found");
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
-    public Professor extractProfessorFromToken(){
+
+    public Professor extractProfessorFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ((ApplicationUser) authentication.getPrincipal()).getProfessor();
     }

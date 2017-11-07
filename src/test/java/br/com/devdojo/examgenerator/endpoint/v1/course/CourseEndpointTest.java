@@ -31,8 +31,6 @@ import static org.springframework.http.HttpMethod.POST;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class CourseEndpointTest {
-    //MAJOR.MINOR.PATCH
-    //4.2.2
     @MockBean
     private CourseRepository courseRepository;
     @Autowired
