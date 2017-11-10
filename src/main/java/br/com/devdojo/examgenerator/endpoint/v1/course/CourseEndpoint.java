@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.course;
 
+import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -22,15 +23,15 @@ import static org.springframework.http.HttpStatus.OK;
 @Api(description = "Operations related to professors' course")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
-    private final CourseService courseService;
+    private final GenericService service;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public CourseEndpoint(CourseRepository courseRepository,
-                          CourseService courseService,
+                          GenericService service,
                           EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
-        this.courseService = courseService;
+        this.service = service;
         this.endpointUtil = endpointUtil;
     }
 
@@ -49,7 +50,7 @@ public class CourseEndpoint {
     @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        courseService.throwResourceNotFoundIfCourseDoesNotExist(id);
+        service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
         courseRepository.delete(id);
         return new ResponseEntity<>(OK);
     }
@@ -57,7 +58,7 @@ public class CourseEndpoint {
     @ApiOperation(value = "Update course and return 200 Ok with no body")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Course course) {
-        courseService.throwResourceNotFoundIfCourseDoesNotExist(course);
+        service.throwResourceNotFoundIfDoesNotExist(course, courseRepository, "Course not found");
         courseRepository.save(course);
         return new ResponseEntity<>(OK);
     }

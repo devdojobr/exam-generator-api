@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.question;
 
+import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -22,15 +23,15 @@ import static org.springframework.http.HttpStatus.OK;
 @Api(description = "Operations related to courses' question")
 public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
-    private final QuestionService questionService;
+    private final GenericService service;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public QuestionEndpoint(QuestionRepository questionRepository,
-                            QuestionService questionService,
+                            GenericService service,
                             EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
-        this.questionService = questionService;
+        this.service = service;
         this.endpointUtil = endpointUtil;
     }
 
@@ -50,7 +51,7 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Delete a specific question and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        questionService.throwResourceNotFoundIfQuestionDoesNotExist(id);
+        service.throwResourceNotFoundIfDoesNotExist(id, questionRepository, "Question not found");
         questionRepository.delete(id);
         return new ResponseEntity<>(OK);
     }
@@ -58,7 +59,7 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Update question and return 200 Ok with no body")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Question question) {
-        questionService.throwResourceNotFoundIfQuestionDoesNotExist(question);
+        service.throwResourceNotFoundIfDoesNotExist(question, questionRepository, "Question not found");
         questionRepository.save(question);
         return new ResponseEntity<>(OK);
     }
