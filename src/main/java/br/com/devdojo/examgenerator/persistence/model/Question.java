@@ -20,38 +20,38 @@ public class Question extends AbstractEntity {
     private Professor professor;
 
 
-    public static final class QuestionBuilder {
+    public static final class Builder {
         private Question question;
 
-        private QuestionBuilder() {
+        private Builder() {
             question = new Question();
         }
 
-        public static QuestionBuilder newQuestion() {
-            return new QuestionBuilder();
+        public static Builder newQuestion() {
+            return new Builder();
         }
 
-        public QuestionBuilder id(Long id) {
+        public Builder id(Long id) {
             question.setId(id);
             return this;
         }
 
-        public QuestionBuilder enabled(boolean enabled) {
+        public Builder enabled(boolean enabled) {
             question.setEnabled(enabled);
             return this;
         }
 
-        public QuestionBuilder title(String title) {
+        public Builder title(String title) {
             question.setTitle(title);
             return this;
         }
 
-        public QuestionBuilder course(Course course) {
+        public Builder course(Course course) {
             question.setCourse(course);
             return this;
         }
 
-        public QuestionBuilder professor(Professor professor) {
+        public Builder professor(Professor professor) {
             question.setProfessor(professor);
             return this;
         }

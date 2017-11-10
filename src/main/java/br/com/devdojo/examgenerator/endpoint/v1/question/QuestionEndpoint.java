@@ -19,7 +19,7 @@ import static org.springframework.http.HttpStatus.OK;
  * @author William Suane for DevDojo on 10/27/17.
  */
 @RestController
-@RequestMapping("v1/professor/question/question")
+@RequestMapping("v1/professor/course/question")
 @Api(description = "Operations related to courses' question")
 public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
@@ -42,8 +42,8 @@ public class QuestionEndpoint {
     }
 
     @ApiOperation(value = "Return a list of question related to course", response = Question.class)
-    @GetMapping(path = "list")
-    public ResponseEntity<?> listQuestions(@ApiParam("Course id") @RequestParam(value = "courseId") long courseId,
+    @GetMapping(path = "list/{courseId}/")
+    public ResponseEntity<?> listQuestions(@PathVariable long courseId,
                                            @ApiParam("Question title") @RequestParam(value = "title", defaultValue = "") String name) {
         return new ResponseEntity<>(questionRepository.listQuestionsByCourseAndTitle(courseId, name), OK);
     }

@@ -40,7 +40,7 @@ public class CourseEndpointTest {
     private HttpEntity<Void> wrongHeader;
     private Course course = mockCourse();
 
-    private static Course mockCourse() {
+    public static Course mockCourse() {
         return Course.Builder.newCourse()
                 .id(1L)
                 .name("Java")
