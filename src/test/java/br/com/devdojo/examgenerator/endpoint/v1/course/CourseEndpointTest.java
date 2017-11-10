@@ -3,7 +3,6 @@ package br.com.devdojo.examgenerator.endpoint.v1.course;
 import br.com.devdojo.examgenerator.endpoint.v1.ProfessorEndpointTest;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
-import br.com.devdojo.examgenerator.persistence.respository.ProfessorRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,8 +65,8 @@ public class CourseEndpointTest {
     @Before
     public void setup() {
         BDDMockito.when(courseRepository.findOne(course.getId())).thenReturn(course);
-        BDDMockito.when(courseRepository.listCourses("")).thenReturn(Collections.singletonList(course));
-        BDDMockito.when(courseRepository.listCourses("java")).thenReturn(Collections.singletonList(course));
+        BDDMockito.when(courseRepository.listCoursesByName("")).thenReturn(Collections.singletonList(course));
+        BDDMockito.when(courseRepository.listCoursesByName("java")).thenReturn(Collections.singletonList(course));
     }
 
     @Test

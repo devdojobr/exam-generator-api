@@ -12,5 +12,5 @@ import java.util.List;
 @SuppressWarnings("ALL")
 public interface CourseRepository extends CustomPagingAndSortRepository<Course, Long> {
     @Query("select c from Course c where c.name like %?1% and c.professor = ?#{principal.professor} and c.enabled = true")
-    List<Course> listCourses(String name);
+    List<Course> listCoursesByName(String name);
 }

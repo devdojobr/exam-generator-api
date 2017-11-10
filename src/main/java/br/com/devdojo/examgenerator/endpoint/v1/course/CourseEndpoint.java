@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +43,7 @@ public class CourseEndpoint {
     @ApiOperation(value = "Return a list of courses related to professor", response = Course.class)
     @GetMapping(path = "list")
     public ResponseEntity<?> listCourses(@ApiParam("Course name") @RequestParam(value = "name", defaultValue = "") String name) {
-        return new ResponseEntity<>(courseRepository.listCourses(name), OK);
+        return new ResponseEntity<>(courseRepository.listCoursesByName(name), OK);
     }
 
     @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")

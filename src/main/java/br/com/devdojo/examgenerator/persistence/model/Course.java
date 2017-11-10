@@ -17,32 +17,7 @@ public class Course extends AbstractEntity {
     private String name;
     @ManyToOne(optional = false)
     private Professor professor;
-    @Column(columnDefinition = "boolean default true")
-    private boolean enabled = true;
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
 
     public static final class Builder {
         private Course course;
@@ -73,5 +48,21 @@ public class Course extends AbstractEntity {
         public Course build() {
             return course;
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
     }
 }
