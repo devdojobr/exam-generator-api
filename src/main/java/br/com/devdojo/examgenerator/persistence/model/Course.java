@@ -3,6 +3,7 @@ package br.com.devdojo.examgenerator.persistence.model;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -16,6 +17,16 @@ public class Course extends AbstractEntity {
     private String name;
     @ManyToOne(optional = false)
     private Professor professor;
+    @Column(columnDefinition = "boolean default true")
+    private boolean enabled = true;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getName() {
         return name;
