@@ -2,6 +2,7 @@ package br.com.devdojo.examgenerator.endpoint.v1.question;
 
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Question;
+import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
@@ -23,14 +24,16 @@ import static org.springframework.http.HttpStatus.OK;
 @Api(description = "Operations related to courses' question")
 public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
+    private final CourseRepository courseRepository;
     private final GenericService service;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public QuestionEndpoint(QuestionRepository questionRepository,
-                            GenericService service,
+                            CourseRepository courseRepository, GenericService service,
                             EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
+        this.courseRepository = courseRepository;
         this.service = service;
         this.endpointUtil = endpointUtil;
     }
@@ -67,6 +70,7 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Create question and return the question created")
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Question question) {
+        service.throwResourceNotFoundIfDoesNotExist(question.getCourse(), courseRepository, "Course not found");
         question.setProfessor(endpointUtil.extractProfessorFromToken());
         return new ResponseEntity<>(questionRepository.save(question), OK);
     }

@@ -14,9 +14,9 @@ public class Question extends AbstractEntity {
     @NotEmpty(message = "The field title cannot be empty")
     @ApiModelProperty(notes = "The title of the question")
     private String title;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Course course;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Professor professor;
 
 
