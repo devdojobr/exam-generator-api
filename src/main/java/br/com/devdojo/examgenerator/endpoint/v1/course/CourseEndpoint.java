@@ -3,12 +3,14 @@ package br.com.devdojo.examgenerator.endpoint.v1.course;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
+import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,14 +25,16 @@ import static org.springframework.http.HttpStatus.OK;
 @Api(description = "Operations related to professors' course")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
+    private final QuestionRepository questionRepository;
     private final GenericService service;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public CourseEndpoint(CourseRepository courseRepository,
-                          GenericService service,
+                          QuestionRepository questionRepository, GenericService service,
                           EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
+        this.questionRepository = questionRepository;
         this.service = service;
         this.endpointUtil = endpointUtil;
     }
@@ -49,9 +53,11 @@ public class CourseEndpoint {
 
     @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
+    @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
         courseRepository.delete(id);
+        questionRepository.deleteAllQuestionsRelatedToCourse(id);
         return new ResponseEntity<>(OK);
     }
 

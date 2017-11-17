@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
@@ -117,7 +118,7 @@ public class CourseEndpointTest {
     public void deleteCourseWhenIdExistsShouldReturn200() throws Exception {
         long id = 1L;
         BDDMockito.doNothing().when(courseRepository).delete(id);
-        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", GET, professorHeader, String.class, id);
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", DELETE, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
     }
 
@@ -125,7 +126,7 @@ public class CourseEndpointTest {
     public void deleteCourseWhenIdDoesNotExistsShouldReturn404() throws Exception {
         long id = -1L;
         BDDMockito.doNothing().when(courseRepository).delete(id);
-        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", GET, professorHeader, String.class, id);
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", DELETE, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
     }
 
