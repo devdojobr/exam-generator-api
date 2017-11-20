@@ -43,7 +43,7 @@ public class QuestionEndpointTest {
     private HttpEntity<Void> wrongHeader;
     private Question question = mockQuestion();
 
-    private static Question mockQuestion() {
+    public static Question mockQuestion() {
         return Question.Builder.newQuestion()
                 .id(1L)
                 .title("What is class?")
@@ -80,7 +80,7 @@ public class QuestionEndpointTest {
     }
 
     @Test
-    public void listQuestionsbyCourseAndTitleWhenTokenIsWrongShouldReturn403() throws Exception {
+    public void listQuestionsByCourseAndTitleWhenTokenIsWrongShouldReturn403() throws Exception {
         ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/question/list/1/?title=", GET, wrongHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(403);
     }

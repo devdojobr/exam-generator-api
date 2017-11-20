@@ -2,6 +2,7 @@ package br.com.devdojo.examgenerator.endpoint.v1.choice;
 
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Choice;
+import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.ChoiceRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -37,6 +38,11 @@ public class ChoiceEndpoint {
         this.choiceRepository = choiceRepository;
         this.service = service;
         this.endpointUtil = endpointUtil;
+    }
+    @ApiOperation(value = "Return a choice based on it's id", response = Choice.class)
+    @GetMapping(path = "{id}")
+    public ResponseEntity<?> getChoiceById(@PathVariable long id) {
+        return endpointUtil.returnObjectOrNotFound(choiceRepository.findOne(id));
     }
 
     @ApiOperation(value = "Return a list of choices related to the questionId", response = Choice[].class)
