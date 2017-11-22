@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.course;
 
+import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
@@ -27,15 +28,17 @@ public class CourseEndpoint {
     private final CourseRepository courseRepository;
     private final QuestionRepository questionRepository;
     private final GenericService service;
+    private final CascadeDeleteService deleteService;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public CourseEndpoint(CourseRepository courseRepository,
                           QuestionRepository questionRepository, GenericService service,
-                          EndpointUtil endpointUtil) {
+                          CascadeDeleteService deleteService, EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
         this.questionRepository = questionRepository;
         this.service = service;
+        this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
     }
 
@@ -51,13 +54,12 @@ public class CourseEndpoint {
         return new ResponseEntity<>(courseRepository.listCoursesByName(name), OK);
     }
 
-    @ApiOperation(value = "Delete a specific course and return 200 Ok with no body")
+    @ApiOperation(value = "Delete a specific course and all related questions and choices and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateCourseExistenceOnDB(id, courseRepository);
-        courseRepository.delete(id);
-        questionRepository.deleteAllQuestionsRelatedToCourse(id);
+        deleteService.cascadeDeleteCourseQuestionAndChoice(id);
         return new ResponseEntity<>(OK);
     }
 
