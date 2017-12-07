@@ -26,17 +26,14 @@ import static org.springframework.http.HttpStatus.OK;
 @Api(description = "Operations related to professors' course")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
-    private final QuestionRepository questionRepository;
     private final GenericService service;
     private final CascadeDeleteService deleteService;
     private final EndpointUtil endpointUtil;
 
     @Autowired
-    public CourseEndpoint(CourseRepository courseRepository,
-                          QuestionRepository questionRepository, GenericService service,
+    public CourseEndpoint(CourseRepository courseRepository, GenericService service,
                           CascadeDeleteService deleteService, EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
-        this.questionRepository = questionRepository;
         this.service = service;
         this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
@@ -58,7 +55,7 @@ public class CourseEndpoint {
     @DeleteMapping(path = "{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
-        validateCourseExistenceOnDB(id, courseRepository);
+        validateCourseExistenceOnDB(id);
         deleteService.cascadeDeleteCourseQuestionAndChoice(id);
         return new ResponseEntity<>(OK);
     }
@@ -66,12 +63,12 @@ public class CourseEndpoint {
     @ApiOperation(value = "Update course and return 200 Ok with no body")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Course course) {
-        validateCourseExistenceOnDB(course.getId(), courseRepository);
+        validateCourseExistenceOnDB(course.getId());
         courseRepository.save(course);
         return new ResponseEntity<>(OK);
     }
 
-    private void validateCourseExistenceOnDB(Long id, CourseRepository courseRepository) {
+    private void validateCourseExistenceOnDB(Long id) {
         service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
     }
 

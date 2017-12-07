@@ -48,18 +48,18 @@ public class QuestionEndpoint {
         return endpointUtil.returnObjectOrNotFound(questionRepository.findOne(id));
     }
 
-    @ApiOperation(value = "Return a list of question related to course", response = Question.class)
+    @ApiOperation(value = "Return a list of question related to course", response = Question[].class)
     @GetMapping(path = "list/{courseId}/")
     public ResponseEntity<?> listQuestions(@PathVariable long courseId,
-                                           @ApiParam("Question title") @RequestParam(value = "title", defaultValue = "") String name) {
-        return new ResponseEntity<>(questionRepository.listQuestionsByCourseAndTitle(courseId, name), OK);
+                                           @ApiParam("Question title") @RequestParam(value = "title", defaultValue = "") String title) {
+        return new ResponseEntity<>(questionRepository.listQuestionsByCourseAndTitle(courseId, title), OK);
     }
 
-    @ApiOperation(value = "Delete a specific question all related choices and return 200 Ok with no body")
+    @ApiOperation(value = "Delete a specific question and all related choices and return 200 Ok with no body")
     @DeleteMapping(path = "{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
-        validateQuestionExistenceOnDB(id, questionRepository);
+        validateQuestionExistenceOnDB(id);
         deleteService.cascadeDeleteQuestionAndChoice(id);
         return new ResponseEntity<>(OK);
     }
@@ -67,12 +67,12 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Update question and return 200 Ok with no body")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Question question) {
-        validateQuestionExistenceOnDB(question.getId(), questionRepository);
+        validateQuestionExistenceOnDB(question.getId());
         questionRepository.save(question);
         return new ResponseEntity<>(OK);
     }
 
-    private void validateQuestionExistenceOnDB(Long id, QuestionRepository questionRepository) {
+    private void validateQuestionExistenceOnDB(Long id) {
         service.throwResourceNotFoundIfDoesNotExist(id, questionRepository, "Question not found");
     }
 
