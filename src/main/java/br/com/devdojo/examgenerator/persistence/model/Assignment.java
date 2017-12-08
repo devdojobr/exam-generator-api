@@ -53,43 +53,43 @@ public class Assignment extends AbstractEntity {
         this.professor = professor;
     }
 
-    public static final class AssignmentBuilder {
+    public static final class Builder {
         private Assignment assignment;
 
-        private AssignmentBuilder() {
+        private Builder() {
             assignment = new Assignment();
         }
 
-        public static AssignmentBuilder newBuilder() {
-            return new AssignmentBuilder();
+        public static Builder newBuilder() {
+            return new Builder();
         }
 
-        public AssignmentBuilder id(Long id) {
+        public Builder id(Long id) {
             assignment.setId(id);
             return this;
         }
 
-        public AssignmentBuilder enabled(boolean enabled) {
+        public Builder enabled(boolean enabled) {
             assignment.setEnabled(enabled);
             return this;
         }
 
-        public AssignmentBuilder title(String title) {
+        public Builder title(String title) {
             assignment.setTitle(title);
             return this;
         }
 
-        public AssignmentBuilder createdAt(LocalDateTime createdAt) {
+        public Builder createdAt(LocalDateTime createdAt) {
             assignment.setCreatedAt(createdAt);
             return this;
         }
 
-        public AssignmentBuilder course(Course course) {
+        public Builder course(Course course) {
             assignment.setCourse(course);
             return this;
         }
 
-        public AssignmentBuilder professor(Professor professor) {
+        public Builder professor(Professor professor) {
             assignment.setProfessor(professor);
             return this;
         }

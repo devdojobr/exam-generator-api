@@ -60,7 +60,7 @@ public class QuestionEndpoint {
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateQuestionExistenceOnDB(id);
-        deleteService.cascadeDeleteQuestionAndChoice(id);
+        deleteService.deleteQuestionAndAllRelatedEntities(id);
         return new ResponseEntity<>(OK);
     }
 

@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.deleteservice;
 
+import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.ChoiceRepository;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
@@ -14,19 +15,24 @@ public class CascadeDeleteService {
     private final QuestionRepository questionRepository;
     private final ChoiceRepository choiceRepository;
     private final CourseRepository courseRepository;
+    private final AssignmentRepository assignmentRepository;
+
     @Autowired
-    public CascadeDeleteService(QuestionRepository questionRepository, ChoiceRepository choiceRepository, CourseRepository courseRepository) {
+    public CascadeDeleteService(QuestionRepository questionRepository, ChoiceRepository choiceRepository, CourseRepository courseRepository, AssignmentRepository assignmentRepository) {
         this.questionRepository = questionRepository;
         this.choiceRepository = choiceRepository;
         this.courseRepository = courseRepository;
+        this.assignmentRepository = assignmentRepository;
     }
 
-    public void cascadeDeleteCourseQuestionAndChoice(long courseId){
+    public void deleteCourseAndAllRelatedEntities(long courseId){
         courseRepository.delete(courseId);
         questionRepository.deleteAllQuestionsRelatedToCourse(courseId);
         choiceRepository.deleteAllChoicesRelatedToCourse(courseId);
+        assignmentRepository.deleteAllAssignmentsRelatedToCourse(courseId);
     }
-    public void cascadeDeleteQuestionAndChoice(long questionId){
+
+    public void deleteQuestionAndAllRelatedEntities(long questionId){
         questionRepository.delete(questionId);
         choiceRepository.deleteAllChoicesRelatedToQuestion(questionId);
     }

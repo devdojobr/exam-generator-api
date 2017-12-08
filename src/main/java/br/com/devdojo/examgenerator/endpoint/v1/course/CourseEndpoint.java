@@ -4,7 +4,6 @@ import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteServi
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
-import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +55,7 @@ public class CourseEndpoint {
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateCourseExistenceOnDB(id);
-        deleteService.cascadeDeleteCourseQuestionAndChoice(id);
+        deleteService.deleteCourseAndAllRelatedEntities(id);
         return new ResponseEntity<>(OK);
     }
 
