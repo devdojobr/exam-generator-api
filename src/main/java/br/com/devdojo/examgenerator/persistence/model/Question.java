@@ -1,10 +1,14 @@
 package br.com.devdojo.examgenerator.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import java.util.List;
 
 /**
  * @author William Suane for DevDojo on 11/10/17.
@@ -18,7 +22,43 @@ public class Question extends AbstractEntity {
     private Course course;
     @ManyToOne(optional = false)
     private Professor professor;
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Choice> choices;
 
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
+
+    public List<Choice> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+    }
 
     public static final class Builder {
         private Question question;
@@ -59,29 +99,5 @@ public class Question extends AbstractEntity {
         public Question build() {
             return question;
         }
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
     }
 }

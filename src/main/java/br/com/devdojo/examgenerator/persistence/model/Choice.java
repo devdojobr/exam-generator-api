@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
