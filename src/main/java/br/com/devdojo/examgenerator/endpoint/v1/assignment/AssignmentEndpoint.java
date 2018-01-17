@@ -3,10 +3,8 @@ package br.com.devdojo.examgenerator.endpoint.v1.assignment;
 import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Assignment;
-import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
-import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,15 +29,17 @@ public class AssignmentEndpoint {
     private final CourseRepository courseRepository;
     private final GenericService service;
     private final EndpointUtil endpointUtil;
+    private final CascadeDeleteService deleteService;
 
     @Autowired
     public AssignmentEndpoint(AssignmentRepository assignmentRepository,
                               CourseRepository courseRepository, GenericService service,
-                              EndpointUtil endpointUtil) {
+                              EndpointUtil endpointUtil, CascadeDeleteService deleteService) {
         this.assignmentRepository = assignmentRepository;
         this.courseRepository = courseRepository;
         this.service = service;
         this.endpointUtil = endpointUtil;
+        this.deleteService = deleteService;
     }
 
     @ApiOperation(value = "Return an assignment based on it's id", response = Assignment.class)
@@ -61,6 +61,7 @@ public class AssignmentEndpoint {
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateAssignmentExistenceOnDB(id);
         assignmentRepository.delete(id);
+        deleteService.deleteAssignmentAndAllRelatedEntities(id);
         return new ResponseEntity<>(OK);
     }
 
