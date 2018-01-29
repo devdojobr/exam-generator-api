@@ -25,4 +25,7 @@ public interface QuestionAssignmentRepository extends CustomPagingAndSortReposit
 
     @Query("select qa from QuestionAssignment qa where qa.question.id = ?1 and qa.assignment.id = ?2 and qa.professor = ?#{principal.professor} and qa.enabled = true")
     List<QuestionAssignment> listQuestionAssignmentByQuestionAndAssignment(long questionId, long assignmentId);
+
+    @Query("select qa from QuestionAssignment qa where  qa.assignment.id = ?1 and qa.professor = ?#{principal.professor} and qa.enabled = true")
+    List<QuestionAssignment> listQuestionAssignmentByAssignmentId(long assignmentId);
 }

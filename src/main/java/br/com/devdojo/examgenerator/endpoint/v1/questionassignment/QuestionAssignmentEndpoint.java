@@ -72,7 +72,7 @@ public class QuestionAssignmentEndpoint {
         return question.getChoices().size() > 1;
     }
 
-    @ApiOperation(value = "Associate a question to an assignment and return the QuestionAssignment created")
+    @ApiOperation(value = "Associate a question to an assignment and return the QuestionAssignment created", response = QuestionAssignment[].class)
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody QuestionAssignment questionAssignment) {
         validateQuestionAndAssignmentExistence(questionAssignment);
@@ -115,6 +115,12 @@ public class QuestionAssignmentEndpoint {
     private void validateQuestionAssignmentOnDB(Long questionAssignmentId) {
         service.throwResourceNotFoundIfDoesNotExist(questionAssignmentId, questionAssignmentRepository, "QuestionAssignment not found");
 
+    }
+
+    @ApiOperation(value = "List all QuestionAssignment associated with assignmentId", response = QuestionAssignment[].class)
+    @GetMapping(path = "{assignmentId}")
+    public ResponseEntity<?> list(@PathVariable long assignmentId) {
+        return new ResponseEntity<>(questionAssignmentRepository.listQuestionAssignmentByAssignmentId(assignmentId), OK);
     }
 }
 

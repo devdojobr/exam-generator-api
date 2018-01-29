@@ -76,7 +76,7 @@ public class QuestionEndpoint {
         service.throwResourceNotFoundIfDoesNotExist(id, questionRepository, "Question not found");
     }
 
-    @ApiOperation(value = "Create question and return the question created")
+    @ApiOperation(value = "Create question and return the question created", response = Question.class)
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Question question) {
         service.throwResourceNotFoundIfDoesNotExist(question.getCourse(), courseRepository, "Course not found");
