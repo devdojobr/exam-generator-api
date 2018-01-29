@@ -4,6 +4,8 @@ import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteServi
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Choice;
 import br.com.devdojo.examgenerator.persistence.model.Question;
+import br.com.devdojo.examgenerator.persistence.model.QuestionAssignment;
+import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.CourseRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionAssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
@@ -12,13 +14,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.NOT_MODIFIED;
+import static org.springframework.http.HttpStatus.OK;
 
 /**
  * @author William Suane for DevDojo on 12/15/17.
@@ -30,17 +33,19 @@ public class QuestionAssignmentEndpoint {
     private final QuestionRepository questionRepository;
     private final QuestionAssignmentRepository questionAssignmentRepository;
     private final CourseRepository courseRepository;
+    private final AssignmentRepository assignmentRepository;
     private final GenericService service;
     private final CascadeDeleteService deleteService;
     private final EndpointUtil endpointUtil;
 
     @Autowired
     public QuestionAssignmentEndpoint(QuestionRepository questionRepository,
-                                      QuestionAssignmentRepository questionAssignmentRepository, CourseRepository courseRepository, GenericService service,
+                                      QuestionAssignmentRepository questionAssignmentRepository, CourseRepository courseRepository, AssignmentRepository assignmentRepository, GenericService service,
                                       CascadeDeleteService deleteService, EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
         this.questionAssignmentRepository = questionAssignmentRepository;
         this.courseRepository = courseRepository;
+        this.assignmentRepository = assignmentRepository;
         this.service = service;
         this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
@@ -66,6 +71,27 @@ public class QuestionAssignmentEndpoint {
         return question.getChoices().size() > 1;
     }
 
+    @ApiOperation(value = "Associate a question to an assignment and return the QuestionAssignment created")
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody QuestionAssignment questionAssignment) {
+        validateQuestionAndAssignmentExistence(questionAssignment);
+        if (isQuestionAlreadyAssociatedWithAssignment(questionAssignment)) {
+            return new ResponseEntity<>(NOT_MODIFIED);
+        }
+        questionAssignment.setProfessor(endpointUtil.extractProfessorFromToken());
+        return new ResponseEntity<>(questionAssignmentRepository.save(questionAssignment), OK);
+    }
 
+    private void validateQuestionAndAssignmentExistence(@Valid @RequestBody QuestionAssignment questionAssignment) {
+        service.throwResourceNotFoundIfDoesNotExist(questionAssignment.getQuestion(), questionRepository, "Question not found");
+        service.throwResourceNotFoundIfDoesNotExist(questionAssignment.getAssignment(), assignmentRepository, "Assignment not found");
+    }
+
+    private boolean isQuestionAlreadyAssociatedWithAssignment(QuestionAssignment questionAssignment) {
+        long questionId = questionAssignment.getQuestion().getId();
+        long assignmentId = questionAssignment.getAssignment().getId();
+        List<QuestionAssignment> questionAssignments = questionAssignmentRepository.listQuestionAssignmentByQuestionAndAssignment(questionId, assignmentId);
+        return !questionAssignments.isEmpty();
+    }
 }
 
