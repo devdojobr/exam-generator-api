@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -92,6 +93,28 @@ public class QuestionAssignmentEndpoint {
         long assignmentId = questionAssignment.getAssignment().getId();
         List<QuestionAssignment> questionAssignments = questionAssignmentRepository.listQuestionAssignmentByQuestionAndAssignment(questionId, assignmentId);
         return !questionAssignments.isEmpty();
+    }
+
+    @ApiOperation(value = "Delete a specific question assigned to an assignment and return 200 Ok with no body")
+    @DeleteMapping(path = "{questionAssignmentId}")
+    @Transactional
+    public ResponseEntity<?> delete(@PathVariable long questionAssignmentId) {
+        validateQuestionAssignmentOnDB(questionAssignmentId);
+        deleteService.deleteQuestionAssignmentAndAllRelatedEntities(questionAssignmentId);
+        return new ResponseEntity<>(OK);
+    }
+
+    @ApiOperation(value = "Update QuestionAssignment and return 200 Ok with no body")
+    @PutMapping
+    public ResponseEntity<?> update(@Valid @RequestBody QuestionAssignment questionAssignment) {
+        validateQuestionAssignmentOnDB(questionAssignment.getId());
+        questionAssignmentRepository.save(questionAssignment);
+        return new ResponseEntity<>(OK);
+    }
+
+    private void validateQuestionAssignmentOnDB(Long questionAssignmentId) {
+        service.throwResourceNotFoundIfDoesNotExist(questionAssignmentId, questionAssignmentRepository, "QuestionAssignment not found");
+
     }
 }
 

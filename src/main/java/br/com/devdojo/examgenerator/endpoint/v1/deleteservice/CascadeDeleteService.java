@@ -41,6 +41,9 @@ public class CascadeDeleteService {
         questionRepository.delete(questionId);
         choiceRepository.deleteAllChoicesRelatedToQuestion(questionId);
         questionAssignmentRepository.deleteAllQuestionAssignmentsRelatedToQuestion(questionId);
+    }
 
+    public void deleteQuestionAssignmentAndAllRelatedEntities(long questionAssignmentId) {
+        questionAssignmentRepository.delete(questionAssignmentId);
     }
 }
