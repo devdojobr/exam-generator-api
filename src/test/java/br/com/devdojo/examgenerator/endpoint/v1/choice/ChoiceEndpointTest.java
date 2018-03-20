@@ -2,10 +2,11 @@ package br.com.devdojo.examgenerator.endpoint.v1.choice;
 
 import br.com.devdojo.examgenerator.endpoint.v1.ProfessorEndpointTest;
 import br.com.devdojo.examgenerator.endpoint.v1.question.QuestionEndpointTest;
+import br.com.devdojo.examgenerator.endpoint.v1.questionassignment.QuestionAssignmentEndpointTest;
 import br.com.devdojo.examgenerator.persistence.model.Choice;
-import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.ChoiceRepository;
+import br.com.devdojo.examgenerator.persistence.respository.QuestionAssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,13 +24,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 /**
  * @author William Suane for DevDojo on 11/20/17.
@@ -42,12 +42,15 @@ public class ChoiceEndpointTest {
     private QuestionRepository questionRepository;
     @MockBean
     private ChoiceRepository choiceRepository;
+    @MockBean
+    private QuestionAssignmentRepository questionAssignmentRepository;
     @Autowired
     private TestRestTemplate testRestTemplate;
     private HttpEntity<Void> professorHeader;
     private HttpEntity<Void> wrongHeader;
     private Choice choiceCorrectAnswerFalse = mockChoiceCorrectAnswerFalse();
     private Choice choiceCorrectAnswerTrue = mockChoiceCorrectAnswerTrue();
+    private Choice choiceWithQuestionNotAssociatedWithAssignment = mockChoiceQuestionNotAssociatedWithAssignment();
 
     public static Choice mockChoiceCorrectAnswerFalse() {
         return Choice.Builder.newChoice()
@@ -69,6 +72,18 @@ public class ChoiceEndpointTest {
                 .build();
     }
 
+    public static Choice mockChoiceQuestionNotAssociatedWithAssignment() {
+        Question question = QuestionEndpointTest.mockQuestion();
+        question.setId(2L);
+        return Choice.Builder.newChoice()
+                .id(3L)
+                .title("is a template")
+                .question(question)
+                .correctAnswer(true)
+                .professor(ProfessorEndpointTest.mockProfessor())
+                .build();
+    }
+
     @Before
     public void configProfessorHeader() {
         String body = "{\"username\":\"william\",\"password\":\"devdojo\"}";
@@ -85,8 +100,12 @@ public class ChoiceEndpointTest {
 
     @Before
     public void setup() {
+        BDDMockito.when(questionAssignmentRepository.listQuestionAssignmentByQuestionId(choiceCorrectAnswerTrue.getQuestion().getId()))
+                .thenReturn(Collections.singletonList(QuestionAssignmentEndpointTest.mockQuestionAssignment()));
+
         BDDMockito.when(choiceRepository.findOne(choiceCorrectAnswerFalse.getId())).thenReturn(choiceCorrectAnswerFalse);
         BDDMockito.when(choiceRepository.findOne(choiceCorrectAnswerTrue.getId())).thenReturn(choiceCorrectAnswerTrue);
+        BDDMockito.when(choiceRepository.findOne(choiceWithQuestionNotAssociatedWithAssignment.getId())).thenReturn(choiceWithQuestionNotAssociatedWithAssignment);
         BDDMockito.when(choiceRepository.listChoicesByQuestionId(choiceCorrectAnswerTrue.getQuestion().getId()))
                 .thenReturn(asList(choiceCorrectAnswerFalse, choiceCorrectAnswerTrue));
         BDDMockito.when(questionRepository.findOne(choiceCorrectAnswerTrue.getQuestion().getId()))
@@ -138,11 +157,19 @@ public class ChoiceEndpointTest {
     }
 
     @Test
-    public void deleteChoiceWhenIdExistsShouldReturn200() throws Exception {
-        long id = 1L;
+    public void deleteChoiceWhenIdExistsAndItsQuestionIsNotInAnyAssignmentShouldReturn200() throws Exception {
+        long id = 3L;
         BDDMockito.doNothing().when(choiceRepository).delete(id);
         ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/question/choice/{id}", DELETE, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
+    }
+
+    @Test
+    public void deleteChoiceWhenIdExistsAndItsQuestionIsInAnyAssignmentShouldReturn409() throws Exception {
+        long id = 1L;
+        BDDMockito.doNothing().when(choiceRepository).delete(id);
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/question/choice/{id}", DELETE, professorHeader, String.class, id);
+        assertThat(exchange.getStatusCodeValue()).isEqualTo(409);
     }
 
     @Test
