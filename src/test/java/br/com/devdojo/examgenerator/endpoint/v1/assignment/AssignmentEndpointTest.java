@@ -4,9 +4,7 @@ import br.com.devdojo.examgenerator.endpoint.v1.ProfessorEndpointTest;
 import br.com.devdojo.examgenerator.endpoint.v1.course.CourseEndpointTest;
 import br.com.devdojo.examgenerator.persistence.model.Assignment;
 import br.com.devdojo.examgenerator.persistence.model.Course;
-import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
-import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,16 +19,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestClientException;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,7 +39,7 @@ public class AssignmentEndpointTest {
     private Assignment assignment = mockAssignment();
 
     public static Assignment mockAssignment() {
-        return Assignment.Builder.newBuilder()
+        return Assignment.Builder.newAssignment()
                 .id(1L)
                 .title("The Java Exam from Hell?")
                 .course(CourseEndpointTest.mockCourse())

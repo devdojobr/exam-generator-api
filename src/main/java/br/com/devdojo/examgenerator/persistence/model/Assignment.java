@@ -70,7 +70,7 @@ public class Assignment extends AbstractEntity {
             assignment = new Assignment();
         }
 
-        public static Builder newBuilder() {
+        public static Builder newAssignment() {
             return new Builder();
         }
 

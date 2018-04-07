@@ -18,6 +18,8 @@ public class ApplicationUser extends AbstractEntity {
     private String password;
     @OneToOne
     private Professor professor;
+    @OneToOne
+    private Student student;
 
     public ApplicationUser() {
     }
@@ -26,6 +28,7 @@ public class ApplicationUser extends AbstractEntity {
         this.username = applicationUser.username;
         this.password = applicationUser.password;
         this.professor = applicationUser.professor;
+        this.student = applicationUser.student;
     }
 
     public String getUsername() {
@@ -50,5 +53,13 @@ public class ApplicationUser extends AbstractEntity {
 
     public void setProfessor(Professor professor) {
         this.professor = professor;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
