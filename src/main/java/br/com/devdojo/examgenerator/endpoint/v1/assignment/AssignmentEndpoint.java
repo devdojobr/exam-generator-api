@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -82,7 +83,16 @@ public class AssignmentEndpoint {
     public ResponseEntity<?> create(@Valid @RequestBody Assignment assignment) {
         service.throwResourceNotFoundIfDoesNotExist(assignment.getCourse(), courseRepository, "Course not found");
         assignment.setProfessor(endpointUtil.extractProfessorFromToken());
+        assignment.setAccessCode(generateAccessCode(assignment.getCourse().getId()));
         return new ResponseEntity<>(assignmentRepository.save(assignment), OK);
+    }
+
+    private long generateAccessCode(long courseId) {
+        long accessCode = ThreadLocalRandom.current().nextLong(1000, 10000);
+        while (assignmentRepository.accessCodeExistsForCourse(accessCode, courseId) != null) {
+            generateAccessCode(courseId);
+        }
+        return accessCode;
     }
 
 
