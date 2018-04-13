@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.persistence.respository;
 
+import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.model.QuestionAssignment;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +32,7 @@ public interface QuestionAssignmentRepository extends CustomPagingAndSortReposit
 
     @Query("select qa from QuestionAssignment qa where qa.question.id = ?1 and qa.professor = ?#{principal.professor} and qa.enabled = true")
     List<QuestionAssignment> listQuestionAssignmentByQuestionId(long questionId);
+
+    @Query("select qa.question from QuestionAssignment qa where qa.assignment.accessCode = ?1 and qa.enabled = true")
+    List<Question> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(long accessCode);
 }

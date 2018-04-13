@@ -122,5 +122,7 @@ public class QuestionAssignmentEndpoint {
     public ResponseEntity<?> list(@PathVariable long assignmentId) {
         return new ResponseEntity<>(questionAssignmentRepository.listQuestionAssignmentByAssignmentId(assignmentId), OK);
     }
+
+
 }
 
