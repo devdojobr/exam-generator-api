@@ -14,6 +14,9 @@ public interface ChoiceRepository extends CustomPagingAndSortRepository<Choice, 
     @Query("select c from Choice c where c.question.id = ?1 and c.professor = ?#{principal.professor} and c.enabled = true")
     List<Choice> listChoicesByQuestionId(long questionId);
 
+    @Query("select c from Choice c where c.question.id in ?1 and c.enabled = true")
+    List<Choice> listChoicesByQuestionsIdForStudent(List<Long> questionsId);
+
     @Query("update Choice c set c.correctAnswer = false where c <> ?1 and c.question = ?2 and c.professor = ?#{principal.professor} and c.enabled = true")
     @Modifying
     void updateAllOtherChoicesCorrectAnswerToFalse(Choice choice, Question question);

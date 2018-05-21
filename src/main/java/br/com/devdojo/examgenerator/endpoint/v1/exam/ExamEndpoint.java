@@ -2,8 +2,10 @@ package br.com.devdojo.examgenerator.endpoint.v1.exam;
 
 import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
+import br.com.devdojo.examgenerator.persistence.model.Choice;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
+import br.com.devdojo.examgenerator.persistence.respository.ChoiceRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionAssignmentRepository;
 import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -16,17 +18,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.http.HttpStatus.OK;
 
 /**
  * @author William Suane for DevDojo on 04/13/18.
  */
 @RestController
-@RequestMapping("v1/student")
+@RequestMapping("v1/student/exam")
 @Api(description = "Operations to associate questions to an assignment")
 public class ExamEndpoint {
     private final QuestionRepository questionRepository;
     private final QuestionAssignmentRepository questionAssignmentRepository;
+    private final ChoiceRepository choiceRepository;
     private final AssignmentRepository assignmentRepository;
     private final GenericService service;
     private final CascadeDeleteService deleteService;
@@ -35,12 +41,13 @@ public class ExamEndpoint {
     @Autowired
     public ExamEndpoint(QuestionRepository questionRepository,
                         QuestionAssignmentRepository questionAssignmentRepository,
-                        AssignmentRepository assignmentRepository,
+                        ChoiceRepository choiceRepository, AssignmentRepository assignmentRepository,
                         GenericService service,
                         CascadeDeleteService deleteService,
                         EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
         this.questionAssignmentRepository = questionAssignmentRepository;
+        this.choiceRepository = choiceRepository;
         this.assignmentRepository = assignmentRepository;
         this.service = service;
         this.deleteService = deleteService;
@@ -48,10 +55,13 @@ public class ExamEndpoint {
     }
 
 
-    @ApiOperation(value = "List all Questions from QuestionAssignment by the assignment access code", response = Question[].class)
-    @GetMapping(path = "questions/{accessCode}")
+    @ApiOperation(value = "List all Choices based on the Questions by the assignment access code", response = Choice[].class)
+    @GetMapping(path = "choice/{accessCode}")
     public ResponseEntity<?> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(@PathVariable long accessCode) {
-        return new ResponseEntity<>(questionAssignmentRepository.listQuestionsFromQuestionAssignmentByAssignmentAccessCode(accessCode), OK);
+        List<Question> questions = questionAssignmentRepository.listQuestionsFromQuestionAssignmentByAssignmentAccessCode(accessCode);
+        List<Long> questionsId = questions.stream().map(Question::getId).collect(Collectors.toList());
+        List<Choice> choices = choiceRepository.listChoicesByQuestionsIdForStudent(questionsId);
+        return new ResponseEntity<>(choices, OK);
     }
 
 
