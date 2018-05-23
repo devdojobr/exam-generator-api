@@ -57,7 +57,7 @@ public class ExamEndpoint {
 
     @ApiOperation(value = "List all Choices based on the Questions by the assignment access code", response = Choice[].class)
     @GetMapping(path = "choice/{accessCode}")
-    public ResponseEntity<?> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(@PathVariable long accessCode) {
+    public ResponseEntity<?> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(@PathVariable String accessCode) {
         List<Question> questions = questionAssignmentRepository.listQuestionsFromQuestionAssignmentByAssignmentAccessCode(accessCode);
         List<Long> questionsId = questions.stream().map(Question::getId).collect(Collectors.toList());
         List<Choice> choices = choiceRepository.listChoicesByQuestionsIdForStudent(questionsId);

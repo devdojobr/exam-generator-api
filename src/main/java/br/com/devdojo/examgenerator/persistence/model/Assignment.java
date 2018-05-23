@@ -20,13 +20,13 @@ public class Assignment extends AbstractEntity {
     private Course course;
     @ManyToOne(optional = false)
     private Professor professor;
-    private Long accessCode;
+    private String accessCode;
 
-    public Long getAccessCode() {
+    public String getAccessCode() {
         return accessCode;
     }
 
-    public void setAccessCode(Long accessCode) {
+    public void setAccessCode(String accessCode) {
         this.accessCode = accessCode;
     }
 
@@ -104,7 +104,7 @@ public class Assignment extends AbstractEntity {
             return this;
         }
 
-        public Builder accessCode(Long accessCode) {
+        public Builder accessCode(String accessCode) {
             assignment.setAccessCode(accessCode);
             return this;
         }

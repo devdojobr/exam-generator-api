@@ -87,12 +87,12 @@ public class AssignmentEndpoint {
         return new ResponseEntity<>(assignmentRepository.save(assignment), OK);
     }
 
-    private long generateAccessCode(long courseId) {
+    private String generateAccessCode(long courseId) {
         long accessCode = ThreadLocalRandom.current().nextLong(1000, 10000);
         while (assignmentRepository.accessCodeExistsForCourse(accessCode, courseId) != null) {
             generateAccessCode(courseId);
         }
-        return accessCode;
+        return String.valueOf(accessCode);
     }
 
 
