@@ -2,6 +2,7 @@ package br.com.devdojo.examgenerator.endpoint.v1.exam;
 
 import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
+import br.com.devdojo.examgenerator.exception.ResourceNotFoundException;
 import br.com.devdojo.examgenerator.persistence.model.Choice;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
@@ -59,6 +60,7 @@ public class ExamEndpoint {
     @GetMapping(path = "choice/{accessCode}")
     public ResponseEntity<?> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(@PathVariable String accessCode) {
         List<Question> questions = questionAssignmentRepository.listQuestionsFromQuestionAssignmentByAssignmentAccessCode(accessCode);
+        if (questions.isEmpty()) throw new ResourceNotFoundException("Invalid access code");
         List<Long> questionsId = questions.stream().map(Question::getId).collect(Collectors.toList());
         List<Choice> choices = choiceRepository.listChoicesByQuestionsIdForStudent(questionsId);
         return new ResponseEntity<>(choices, OK);
