@@ -89,7 +89,7 @@ public class AssignmentEndpoint {
 
     private String generateAccessCode(long courseId) {
         long accessCode = ThreadLocalRandom.current().nextLong(1000, 10000);
-        while (assignmentRepository.accessCodeExistsForCourse(accessCode, courseId) != null) {
+        while (assignmentRepository.accessCodeExistsForCourse(String.valueOf(accessCode), courseId) != null) {
             generateAccessCode(courseId);
         }
         return String.valueOf(accessCode);

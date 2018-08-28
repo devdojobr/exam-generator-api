@@ -19,5 +19,8 @@ public interface AssignmentRepository extends CustomPagingAndSortRepository<Assi
     void deleteAllAssignmentsRelatedToCourse(long courseId);
 
     @Query("select a from Assignment a where a.course.id = ?1 and a.accessCode =?2 and a.professor = ?#{principal.professor} and a.enabled = true")
-    Assignment accessCodeExistsForCourse(long accessCode, long courseId);
+    Assignment accessCodeExistsForCourse(String accessCode, long courseId);
+
+    @Query("select a from Assignment a where a.accessCode =?1 and a.enabled = true")
+    Assignment accessCodeExists(String accessCode);
 }
