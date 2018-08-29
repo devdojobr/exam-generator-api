@@ -3,18 +3,14 @@ package br.com.devdojo.examgenerator.endpoint.v1.exam;
 import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.exception.ResourceNotFoundException;
-import br.com.devdojo.examgenerator.persistence.model.Assignment;
-import br.com.devdojo.examgenerator.persistence.model.Choice;
-import br.com.devdojo.examgenerator.persistence.model.Question;
-import br.com.devdojo.examgenerator.persistence.respository.AssignmentRepository;
-import br.com.devdojo.examgenerator.persistence.respository.ChoiceRepository;
-import br.com.devdojo.examgenerator.persistence.respository.QuestionAssignmentRepository;
-import br.com.devdojo.examgenerator.persistence.respository.QuestionRepository;
+import br.com.devdojo.examgenerator.persistence.model.*;
+import br.com.devdojo.examgenerator.persistence.respository.*;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +30,7 @@ public class ExamEndpoint {
     private final QuestionAssignmentRepository questionAssignmentRepository;
     private final ChoiceRepository choiceRepository;
     private final AssignmentRepository assignmentRepository;
+    private final ExamAnswerRepository examAnswerRepository;
     private final GenericService service;
     private final CascadeDeleteService deleteService;
     private final EndpointUtil endpointUtil;
@@ -42,13 +39,14 @@ public class ExamEndpoint {
     public ExamEndpoint(QuestionRepository questionRepository,
                         QuestionAssignmentRepository questionAssignmentRepository,
                         ChoiceRepository choiceRepository, AssignmentRepository assignmentRepository,
-                        GenericService service,
+                        ExamAnswerRepository examAnswerRepository, GenericService service,
                         CascadeDeleteService deleteService,
                         EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
         this.questionAssignmentRepository = questionAssignmentRepository;
         this.choiceRepository = choiceRepository;
         this.assignmentRepository = assignmentRepository;
+        this.examAnswerRepository = examAnswerRepository;
         this.service = service;
         this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
@@ -67,11 +65,38 @@ public class ExamEndpoint {
 
     @ApiOperation(value = "Save Student's answers")
     @PostMapping(path = "{accessCode}")
+    @Transactional
+    @ExceptionHandler
     public ResponseEntity<?> save(@PathVariable String accessCode, @RequestBody Map<Long, Long> questionChoiceIdsMap) {
         Assignment assignment = assignmentRepository.accessCodeExists(accessCode);
         if (assignment == null) throw new ResourceNotFoundException("Invalid access code");
-        System.out.println(questionChoiceIdsMap);
+        internallySaveExamAnswer(questionChoiceIdsMap, assignment);
         return new ResponseEntity<>(OK);
+    }
+
+    @ExceptionHandler
+    private void internallySaveExamAnswer(Map<Long, Long> questionChoiceIdsMap, Assignment assignment) {
+        questionChoiceIdsMap.forEach((questionId, choiceId) -> {
+            QuestionAssignment questionAssignment = questionAssignmentRepository.findQuestionAssignmentByAssignmentIdAndQuestionId(assignment.getId(), questionId);
+            Choice selectedChoiceByStudent = choiceRepository.findOne(choiceId);
+            Choice correctChoice = choiceRepository.findCorrectChoiceForQuestion(questionId);
+            ExamAnswer examAnswer = ExamAnswer.ExamAnswerBuilder.newExamAnswer()
+                    .questionId(questionId)
+                    .assignmentId(assignment.getId())
+                    .questionAssignmentId(questionAssignment.getId())
+                    .professorId(assignment.getProfessor().getId())
+                    .studentId(endpointUtil.extractStudentFromToken().getId())
+                    .assignmentTitle(assignment.getTitle())
+                    .questionTitle(questionAssignment.getQuestion().getTitle())
+                    .choiceGrade(questionAssignment.getGrade())
+                    .answerGrade(selectedChoiceByStudent.isCorrectAnswer() ? questionAssignment.getGrade() : 0)
+                    .selectedChoiceId(selectedChoiceByStudent.getId())
+                    .selectedChoiceTitle(selectedChoiceByStudent.getTitle())
+                    .correctChoiceId(correctChoice.getId())
+                    .correctChoiceTitle(correctChoice.getTitle())
+                    .build();
+            examAnswerRepository.save(examAnswer);
+        });
     }
 
 

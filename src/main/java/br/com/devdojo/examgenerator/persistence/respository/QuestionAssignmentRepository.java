@@ -35,4 +35,7 @@ public interface QuestionAssignmentRepository extends CustomPagingAndSortReposit
 
     @Query("select qa.question from QuestionAssignment qa where qa.assignment.accessCode = ?1 and qa.enabled = true")
     List<Question> listQuestionsFromQuestionAssignmentByAssignmentAccessCode(String accessCode);
+
+    @Query("select qa from QuestionAssignment qa where qa.assignment.id = ?1 and qa.question.id = ?2 and qa.enabled = true")
+    QuestionAssignment findQuestionAssignmentByAssignmentIdAndQuestionId(long assignmentId, long questionId);
 }
