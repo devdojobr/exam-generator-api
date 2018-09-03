@@ -22,5 +22,5 @@ public interface AssignmentRepository extends CustomPagingAndSortRepository<Assi
     Assignment accessCodeExistsForCourse(String accessCode, long courseId);
 
     @Query("select a from Assignment a where a.accessCode =?1 and a.enabled = true")
-    Assignment accessCodeExists(String accessCode);
+    Assignment findAssignmentByAccessCode(String accessCode);
 }
